@@ -16,7 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { loginSchema, type LoginFormData } from "./schema";
 
-export default function Login2Page() {
+export default function LoginPage() {
     const [loading, setLoading] = useState(false);
 
     const form = useForm<LoginFormData>({
