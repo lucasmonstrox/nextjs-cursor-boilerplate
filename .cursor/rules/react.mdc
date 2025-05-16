@@ -230,106 +230,106 @@ This approach keeps the type definitions more explicit and avoids implicit props
 
 ---
 
-# 📚 Organização dos Imports
+# 📚 Import Organization
 
-Para manter a legibilidade e facilitar a manutenção do código, é fundamental seguir uma ordem consistente nos imports. A ordem recomendada é:
+Keeping **imports organized** is essential for readability, easy navigation, and long-term maintainability—especially in large projects.
 
-1. **Pacotes externos** (ex: `react`, `next`)
-2. **Aliases** (ex: `@/components`, `@/utils`)
-3. **Imports relativos** (`./`, `../`)
+It's recommended to follow a **consistent block order**, and **alphabetize imports within each block**. This avoids duplication, improves auto-import behavior, and makes the code easier to scan.
 
-Seguindo essa estrutura, o código fica mais organizado e fácil de navegar, especialmente em projetos maiores.
+## 🧭 Recommended Order:
 
-## ❌ Errado (imports desorganizados)
+1. **External packages** (alphabetically)  
+   _Example:_ `next`, `react`, `zod`
+
+2. **Aliases (with @)** (alphabetically)  
+   _Example:_ `@/components`, `@/hooks`, `@/utils`
+
+3. **Relative imports** (`./`, `../`) (alphabetically)  
+   _Example:_ `./Form`, `../hooks/useSomething`
+
+---
+
+## ❌ Incorrect (disorganized imports)
 
 ```tsx
 import { useState } from 'react';
 import {
-  MenuItem,
   LogoLink,
+  MenuItem,
   StorageCard,
   UserCard,
-  mainMenuItems,
-  footerMenuItems,
 } from './menu';
 import { usePathname } from 'next/navigation';
 import { formatDate } from '@/utils/date';
 ```
 
-- Os imports internos (./menu) estão misturados com pacotes externos.
-- O alias (@/utils) está depois de um import relativo, o que não é o ideal.
+- External packages are out of order (react comes before next).
+- Aliases (@/) appear after relative imports (./), which breaks the hierarchy.
 
-## ✅ Certo (organização correta dos imports)
+## ✅ Correct (block structure and alphabetical order)
 
 ```tsx
-import { useState } from 'react';
 import { usePathname } from 'next/navigation';
+import { useState } from 'react';
 
 import { formatDate } from '@/utils/date';
+
 import {
-  MenuItem,
   LogoLink,
+  MenuItem,
   StorageCard,
   UserCard,
-  mainMenuItems,
-  footerMenuItems,
 } from './menu';
 ```
 
-- Pacotes externos vêm primeiro.
-- Depois, imports por alias **(@/)**.
-- Por fim, imports relativos **(./)**.
+- External packages come first (next before react, alphabetically).
+- Then alias imports (@/utils).
+- Finally, relative imports (./menu), also alphabetized internally.
 
 ---
 
-# 🔔 Alertas com Toast (ShadCN)
+# 🔔 Alerts with Toast (Sonner)
 
-Para exibir alertas, mensagens de sucesso, erro ou informações no projeto, **utilize o componente `toast` da biblioteca ShadCN**. Ele oferece uma interface elegante, consistente e de fácil integração com o design system do projeto.
+To display alerts, success messages, errors, or informational messages in the project, **use the `toast` function from the [Sonner](mdc:https:/sonner.emilkowal.ski) library**. It provides a modern, accessible, and consistent interface with the project's design system.
 
----
+## ✅ How to use it properly
 
-## ✅ Como usar corretamente
-
-1. **Importe o hook `useToast`**:
+1. **Import the `toast` function directly from `sonner`**:
 
 ```tsx
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 ```
 
-Utilize o toast onde for necessário:
+2. Use the toast wherever needed:
 
 ```tsx
-const { toast } = useToast();
-
-toast({
-  title: "Scheduled: Catch up",
-  description: "Friday, February 10, 2023 at 5:57 PM",
+toast("Action completed successfully!", {
+  description: "Your data has been saved.",
 });
 ```
 
-### 🎯 Exemplo completo
+## 🎯 Full example
 
 ```tsx
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 export function AlertButton() {
-  const { toast } = useToast();
-
   return (
     <Button
       onClick={() =>
-        toast({
-          title: "Ação realizada com sucesso!",
-          description: "Seus dados foram salvos.",
+        toast("Action completed successfully!", {
+          description: "Your data has been saved.",
         })
       }
     >
-      Mostrar alerta
+      Show Alert
     </Button>
   );
 }
 ```
+
+---
 
 # 🧹 Verificação de Classes do Tema no Componente Base
 
