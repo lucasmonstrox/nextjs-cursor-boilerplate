@@ -1,0 +1,625 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# 🧱 Criando Componentes React com Boas Práticas
+
+Este guia padroniza a criação de componentes React no projeto, visando legibilidade, consistência e facilidade de manutenção.
+
+> ⚠️ **NUNCA use comentários dentro do código.**  
+> Toda documentação e explicação deve estar fora do escopo do código, neste guia ou documentação externa. Comentários no código devem ser evitados completamente para manter o código limpo e direto.
+
+---
+
+## 🔁 Evite Código Repetido
+
+Evite repetir blocos de código semelhantes. Sempre que possível, **extraia dados para estruturas reutilizáveis** (como arrays ou objetos) e use `map` para gerar componentes dinamicamente. Isso reduz erros, facilita manutenção e torna o código mais escalável.
+
+### ❌ Errado (repetição manual de componentes)
+
+```tsx
+<nav className="px-4 space-y-1">
+  <MenuItem
+    icon={<FaHome size={20} />}
+    text="Gestão"
+    href="/gestao"
+    active={true}
+  />
+  <MenuItem
+    icon={<FaChartBar size={20} />}
+    text="Planejamentos"
+    href="/planejamentos"
+  />
+  <MenuItem
+    icon={<FaLayerGroup size={20} />}
+    text="Monitoramento"
+    href="/monitoramento"
+  />
+  <MenuItem
+    icon={<FaCheckSquare size={20} />}
+    text="Análises"
+    href="/analises"
+  />
+  <MenuItem
+    icon={<FaFlag size={20} />}
+    text="Auditoria"
+    href="/auditoria"
+  />
+</nav>
+```
+
+Esse padrão é difícil de manter e propenso a erro se algo mudar em todos os itens.
+
+### ✅ Certo (gerado dinamicamente via array)
+
+```tsx
+const menuItems = [
+  { icon: <FaHome size={20} />, text: 'Gestão', href: '/gestao', active: true },
+  { icon: <FaChartBar size={20} />, text: 'Planejamentos', href: '/planejamentos' },
+  { icon: <FaLayerGroup size={20} />, text: 'Monitoramento', href: '/monitoramento' },
+  { icon: <FaCheckSquare size={20} />, text: 'Análises', href: '/analises' },
+  { icon: <FaFlag size={20} />, text: 'Auditoria', href: '/auditoria' }
+]
+
+<nav className="px-4 space-y-1">
+  {menuItems.map(({ icon, text, href, active }) => (
+    <MenuItem
+      key={href}
+      icon={icon}
+      text={text}
+      href={href}
+      active={active}
+    />
+  ))}
+</nav>
+```
+
+---
+
+## 🚫 Evite `export default` em componentes comuns
+
+Evite usar `export default` para componentes **que não são pages do Next.js**. Prefira **exportações nomeadas** (`export const`). Isso melhora a autocompletação, refatoração e reduz ambiguidade em imports.
+
+### ❌ Errado (com `export default` em componente comum)
+
+```tsx
+const MenuItem = ({ text }: { text: string }) => {
+  return <div>{text}</div>;
+};
+
+export default MenuItem;
+```
+
+export default dificulta a refatoração automática e permite renomeações inconsistentes no momento do import.
+
+### ✅ Certo (com export const)
+
+```tsx
+export const MenuItem = ({ text }: { text: string }) => {
+  return <div>{text}</div>;
+};
+```
+
+---
+
+## 🎨 Importação de Ícones
+
+Sempre utilize `as` para renomear ícones importados. Isso melhora a clareza do propósito do ícone no contexto onde será usado, evitando nomes genéricos e ambíguos no escopo do código.
+
+### ❌ Errado (import direto sem renomear)
+
+```tsx
+import { FaSignOutAlt } from "react-icons/fa";
+
+<FaSignOutAlt />
+```
+
+O nome original do ícone pode não ser claro no contexto. Além disso, nomes genéricos como FaXyz poluem o escopo e dificultam a leitura.
+
+### ✅ Certo (import com alias nomeado)
+
+```tsx
+import { FaSignOutAlt as SignOutIcon } from "react-icons/fa";
+
+<SignOutIcon />
+```
+
+Dar um nome que reflita a intenção de uso melhora a clareza e facilita a leitura e manutenção do código.
+
+---
+
+## 📥 Imports do React
+
+Evite importar o módulo completo do React apenas para usar tipos. Isso adiciona código desnecessário e vai contra as práticas modernas com o JSX automático (React 17+).
+
+### ❌ Errado (importação desnecessária de todo o React)
+
+```tsx
+import React from 'react';
+
+type MenuItemProps = {
+  icon: React.ReactNode;
+  text: string;
+  href: string;
+  active?: boolean;
+};
+```
+
+### ✅ Certo (importando apenas o que precisa)
+
+```tsx
+import { ReactNode } from 'react';
+
+type MenuItemProps = {
+  icon: ReactNode;
+  text: string;
+  href: string;
+  active?: boolean;
+};
+```
+
+---
+
+## 📦 Modularização de Componentes
+
+Cada componente deve estar em seu **próprio arquivo**. Isso garante melhor organização, facilita testes, reaproveitamento e leitura do código. Evite agrupar múltiplos componentes em um único arquivo.
+
+### ❌ Errado (vários componentes no mesmo arquivo)
+
+```tsx
+// ButtonGroup.tsx
+type ButtonProps = {
+  text: string
+  onClick: () => void
+}
+
+export const Button = ({ text, onClick }: ButtonProps) => {
+  return <button onClick={onClick}>{text}</button>
+}
+
+export const SecondaryButton = ({ text }: { text: string }) => {
+  return <button className="secondary">{text}</button>
+}
+```
+
+Isso dificulta a reutilização, leitura e testabilidade. Não é escalável.
+
+### ✅ Certo (um componente por arquivo)
+
+```tsx
+// components/Button.tsx
+type ButtonProps = {
+  text: string
+  onClick: () => void
+}
+
+export const Button = ({ text, onClick }: ButtonProps) => {
+  return <button onClick={onClick}>{text}</button>
+}
+```
+
+## 🧩 Priorizando Componentes do Shadcn
+
+Antes de criar um componente personalizado, verifique se o Shadcn já oferece uma solução adequada. Isso garante consistência visual, acessibilidade e reduz código duplicado.
+
+### ❌ Errado (criando componente personalizado sem necessidade)
+
+```tsx
+export const CustomButton = ({ text, onClick }: { text: string; onClick: () => void }) => {
+  return (
+    <button 
+      className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+      onClick={onClick}
+    >
+      {text}
+    </button>
+  )
+}
+```
+
+### ✅ Certo (utilizando componente do Shadcn)
+
+```tsx
+import { Button } from "@/components/ui/button"
+
+export const ActionButton = ({ text, onClick }: { text: string; onClick: () => void }) => {
+  return (
+    <Button onClick={onClick}>
+      {text}
+    </Button>
+  )
+}
+```
+
+---
+
+## Sempre utilize `return`
+
+Mesmo em componentes simples, sempre utilize `return`. Isso facilita a inserção de lógica futura e evita erros.
+
+### ❌ Errado (sem return)
+
+```tsx
+const Button = () => <button>Click</button>
+```
+
+### ✅ Certo (com return)
+
+```tsx
+const Button = () => {
+  return <button>Click</button>
+}
+```
+
+Usar `return` garante que qualquer adição futura (como condicionais ou efeitos colaterais) seja mais simples de implementar.
+
+---
+
+## 🧾 Tipando Props sem `React.FC`
+
+Evite usar `React.FC` (ou `React.FunctionComponent`) por causa de inferências implícitas como `children` obrigatório. Tipar as props diretamente é mais claro e flexível.
+
+### Exemplo com tipo definido manualmente
+
+```tsx
+type ButtonProps = {
+  text: string
+  onClick: () => void
+}
+
+const Button = ({ text, onClick }: ButtonProps) => {
+  return <button onClick={onClick}>{text}</button>
+}
+```
+
+### Exemplo usando `ComponentProps` (sem `React.FC`)
+
+```tsx
+const Input = ({ ...props }: ComponentProps<'input'>) => {
+  return <input {...props} />
+}
+```
+
+Essa abordagem funciona bem para reutilizar tipagens nativas do JSX/DOM ou de outros componentes personalizados.
+
+---
+
+## 📚 Organização dos Imports
+
+Para manter a legibilidade e facilitar a manutenção do código, é fundamental seguir uma ordem consistente nos imports. A ordem recomendada é:
+
+1. **Pacotes externos** (ex: `react`, `next`)
+2. **Aliases** (ex: `@/components`, `@/utils`)
+3. **Imports relativos** (`./`, `../`)
+
+Seguindo essa estrutura, o código fica mais organizado e fácil de navegar, especialmente em projetos maiores.
+
+### ❌ Errado (imports desorganizados)
+
+```tsx
+import { useState } from 'react';
+import {
+  MenuItem,
+  LogoLink,
+  StorageCard,
+  UserCard,
+  mainMenuItems,
+  footerMenuItems,
+} from './menu';
+import { usePathname } from 'next/navigation';
+import { formatDate } from '@/utils/date';
+```
+
+- Os imports internos (./menu) estão misturados com pacotes externos.
+- O alias (@/utils) está depois de um import relativo, o que não é o ideal.
+
+### ✅ Certo (organização correta dos imports)
+
+```tsx
+import { useState } from 'react';
+import { usePathname } from 'next/navigation';
+import { formatDate } from '@/utils/date';
+import {
+  MenuItem,
+  LogoLink,
+  StorageCard,
+  UserCard,
+  mainMenuItems,
+  footerMenuItems,
+} from './menu';
+```
+
+- Pacotes externos vêm primeiro.
+- Depois, imports por alias **(@/)**.
+- Por fim, imports relativos **(./)**.
+
+---
+
+## 🚫 Por que não usar `React.FC`
+
+* Adiciona automaticamente o prop `children`, mesmo quando não desejado
+* Pode esconder problemas de tipagem
+* Menos explícito e mais propenso a ambiguidade
+
+Manter a tipagem próxima à declaração da função torna o código mais previsível e simples de evoluir.
+
+Para componentes mais complexos (como os que usam `forwardRef` ou composição), siga os mesmos princípios: **use `return` e tipagem clara das props**.
+
+Fique à vontade para adaptar conforme o contexto, mas use essas diretrizes como base.
+
+## 🧩 Uso correto do `react-hook-form` com `FormProvider`
+
+Ao trabalhar com formulários complexos no React usando `react-hook-form`, é uma boa prática utilizar o `FormProvider` para compartilhar o contexto do formulário entre os componentes. Isso mantém o código mais limpo, organizado e reaproveitável, especialmente quando usamos componentes customizados de input que acessam o formulário via `useFormContext`.
+
+---
+
+### ❌ Errado (sem `FormProvider` e passando erros manualmente)
+
+```tsx
+const {
+  register,
+  handleSubmit,
+  formState: { errors },
+} = useForm<EmailSettingsFormData>({
+  resolver: zodResolver(EmailSettingsSchema),
+});
+
+<form
+  className="grid grid-cols-2 gap-4 p-8"
+  onSubmit={handleSubmit(onSubmit)}
+>
+  <Input
+    placeholder="sim"
+    {...register("nome", { required: true })}
+    error={errors.nome?.message}
+  />
+</form>
+```
+
+- Os métodos do formulário estão sendo passados diretamente.
+- O componente **<Input />** precisa receber manualmente o erro **(error={errors.nome?.message})**, o que aumenta a complexidade e o acoplamento entre o formulário e os campos.
+
+### ✅ Certo (usando FormProvider + useFormContext())
+
+```tsx
+const methods = useForm<EmailSettingsFormData>({
+  resolver: zodResolver(EmailSettingsSchema),
+});
+
+<FormProvider {...methods}>
+  <form
+    className="grid grid-cols-2 gap-4 p-8"
+    onSubmit={methods.handleSubmit(onSubmit)}
+  >
+    <Input placeholder="Nome" {...register("nome", { required: true })} />
+  </form>
+</FormProvider>
+```
+
+- O **<Input />** se torna um componente desacoplado e reutilizável.
+- Os erros são tratados internamente usando **useFormContext()**.
+- O formulário principal fica mais limpo e sem lógica duplicada.
+
+## 🔔 Alertas com Toast (ShadCN)
+
+Para exibir alertas, mensagens de sucesso, erro ou informações no projeto, **utilize o componente `toast` da biblioteca ShadCN**. Ele oferece uma interface elegante, consistente e de fácil integração com o design system do projeto.
+
+---
+
+### ✅ Como usar corretamente
+
+1. **Importe o hook `useToast`**:
+
+```tsx
+import { useToast } from "@/hooks/use-toast";
+```
+
+Utilize o toast onde for necessário:
+
+```tsx
+const { toast } = useToast();
+
+toast({
+  title: "Scheduled: Catch up",
+  description: "Friday, February 10, 2023 at 5:57 PM",
+});
+```
+
+### 🎯 Exemplo completo
+
+```tsx
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+
+export function AlertButton() {
+  const { toast } = useToast();
+
+  return (
+    <Button
+      onClick={() =>
+        toast({
+          title: "Ação realizada com sucesso!",
+          description: "Seus dados foram salvos.",
+        })
+      }
+    >
+      Mostrar alerta
+    </Button>
+  );
+}
+```
+
+### ❌ Evite usar alert() ou console.log() para notificações visuais
+
+```tsx
+// Não faça isso:
+alert("Dados salvos com sucesso!");
+console.log("Erro ao salvar dados");
+```
+
+## 🧹 Verificação de Classes do Tema no Componente Base
+
+Ao inspecionar o Figma ou usar um componente existente, sempre verifique se as **classes do tema** ou do **design system** já estão presentes no componente base. Isso evita a **duplicação de classes** e mantém o código mais limpo e organizado. Reutilizar o componente base garante **consistência** e facilita a **manutenção** do projeto.
+
+---
+
+### ❌ Errado (Duplicando Classes no Componente Base)
+
+**Componente `Button` Base (já com classes predefinidas no design system):**
+
+```tsx
+// Button.tsx (componente base)
+export const Button = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <button className="bg-blue-500 text-white p-3 rounded-md shadow-lg">
+      {children}
+    </button>
+  );
+};
+```
+
+Componente **CustomPage** (duplicando as classes no componente base):
+
+```tsx
+// CustomPage.tsx (utilizando o Button base, mas duplicando as classes)
+import { Button } from "./Button";
+
+export const CustomPage = () => {
+  return (
+    <div>
+      <h1>Página Personalizada</h1>
+      <Button className="bg-blue-500 text-white p-3 rounded-md shadow-lg">Clique aqui</Button>
+    </div>
+  );
+};
+```
+
+- Problema: O **CustomPage** está reaproveitando o componente **Button**, mas duplicou as classes definidas no componente base **Button** (**bg-blue-500**, **text-white**, **p-3**, **rounded-md**, **shadow-lg**). Isso cria duplicação de estilos, pois o **Button** já possui essas classes internamente.
+- **Consequência**: Duplicar as classes torna o código mais difícil de manter, já que qualquer modificação nos estilos do **Button** precisaria ser feita em vários lugares, gerando inconsistência no design.
+
+### ✅ Certo (Usando o Componente Base Sem Duplicar as Classes)
+
+```tsx
+// Button.tsx (componente base)
+import { Button } from "./Button";
+
+const CustomPage = () => {
+  return (
+    <div>
+      <h1>Página Personalizada</h1>
+      <Button>Clique aqui</Button>
+    </div>
+  );
+};
+```
+
+- **Solução**: O componente **CustomPage** usa o componente **Button** base sem adicionar classes adicionais. O **Button** já está estilizado com as classes **bg-blue-500**, **text-white**, **p-3**, **rounded-md**, **shadow-lg** no componente base, portanto não há necessidade de repetir essas classes no **CustomPage**.
+- **Benefício**: O código é mais limpo, consistente e fácil de manter. Caso os estilos do **Button** precisem ser alterados, a mudança será feita em um único lugar (no componente **Button**), garantindo uniformidade em todo o projeto.
+
+---
+
+## 🔠 Ordenação Alfabética nas Keywords de Import
+
+Ao importar múltiplos itens de um mesmo módulo, **ordene-os em ordem alfabética**. Isso facilita a leitura, evita duplicações e melhora a organização do código.
+
+---
+
+### ❌ Errado (itens fora de ordem)
+
+```tsx
+import {
+  footerMenuItems,
+  mainMenuItems,
+  MenuItem,
+  StorageCard,
+  UserCard,
+} from './menu';
+```
+
+Os itens estão fora de ordem alfabética, o que dificulta a visualização rápida e pode gerar duplicações acidentais.
+
+### ✅ Certo (ordenado alfabeticamente)
+
+```tsx
+import {
+  MenuItem,
+  StorageCard,
+  UserCard,
+  footerMenuItems,
+  mainMenuItems,
+} from './menu';
+```
+
+Importações organizadas de forma alfabética, tornando o código mais limpo e fácil de manter.
+
+---
+
+## 🎯 Prompt: Exportando Componentes e Telas do Figma Usando Tailwind com Consistência
+
+Sempre que estiver criando componentes ou telas com base em um design do Figma, **não copie valores ao pé da letra**.  
+Antes de aplicar qualquer cor, tamanho, espaçamento, borda, tipografia, etc., verifique se esse valor já está **definido no tema do projeto** (ex: `globals.css`).  
+Se estiver, **use o token do tema**. 
+Se não estiver, **use o valor mais próximo** disponível no design system.
+
+---
+
+### ✅ Regras Gerais
+
+- 🔍 **Verifique o tema (`globals.css`) antes de aplicar qualquer classe.**
+- 🎨 **Use classes do Tailwind apenas com valores definidos no tema.**
+- 🧠 **Se o valor no Figma for um pouco diferente (ex: `42px`) e não existir no tema, escolha o valor mais próximo** (ex: `40px`).
+- ⛔ **Evite valores "mágicos" como `17px`, `#3A57E8`, `41.25px`, etc.**
+
+---
+
+### 💡 Exemplo prático
+
+**Design no Figma:**
+- Cor: `#3A57E8`
+- Altura do botão: `42px`
+- Padding horizontal: `18px`
+- Border radius: `6px`
+- Font size: `15px`
+- Font weight: `500`
+
+---
+
+### ❌ Errado (copiando valores do Figma direto)
+
+```tsx
+<button
+  style={{
+    backgroundColor: '#3A57E8',
+    height: '42px',
+    padding: '10px 18px',
+    borderRadius: '6px',
+    fontSize: '15px',
+    fontWeight: 500,
+  }}
+>
+  Salvar
+</button>
+```
+
+### ✅ Certo (usando valores do tema no Tailwind)
+
+```tsx
+<button className="bg-primary h-10 px-4 py-2 rounded-md text-base font-medium">
+  Salvar
+</button>
+```
+
+| Propriedade        | Figma   | Tailwind Usado     | Justificativa                             |
+| ------------------ | ------- | ------------------ | ----------------------------------------- |
+| Cor                | #3A57E8 | `bg-primary`       | Cor já existe no tema                     |
+| Altura             | 42px    | `h-10` (40px)      | Mais próximo do valor no design system    |
+| Padding horizontal | 18px    | `px-4` (16px)      | Valor padrão mais próximo                 |
+| Padding vertical   | 10px    | `py-2` (8px)       | Valor padrão mais próximo                 |
+| Border radius      | 6px     | `rounded-md`       | Valor equivalente no tema                 |
+| Font size          | 15px    | `text-base` (16px) | 1px de diferença, sem impacto perceptível |
+| Font weight        | 500     | `font-medium`      | Valor correspondente                      |
+
+---
+
+Siga sempre as regras!

@@ -1,0 +1,113 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# 🧱 Evite Duplicar **className** em Componentes Reutilizáveis
+
+Antes de criar um novo componente no Figma, **verifique se ele já existe**. Por exemplo, se você precisa de um botão, procure pelo componente `Button`.
+
+Evite adicionar manualmente `className` com estilos como `border-radius` (`rounded-md`), `color` (`text-white`, `text-gray-800`), `background-color` (`bg-blue-600`, `bg-red-500`), `padding` (`px-4`, `py-2`, `p-3`), `font-size` (`text-sm`, `text-lg`), etc, se esses estilos **já estão incluídos no componente** (ex: `Button`) por meio de suas variantes — eles **já fazem parte do `className` gerado** internamente.
+
+> 🎯 Se o estilo já está presente na variante, ele **já será refletido no `className` gerado**, e **não precisa ser reaplicado manualmente**.
+
+## ❌ Errado (repetição de estilos já existentes)
+
+Foi usado o componente `Button`, mas os estilos foram reaplicados manualmente via `className`, o que é redundante e pode gerar inconsistências:
+
+```tsx
+<Button className="bg-blue-600 text-white px-4 py-2 rounded-md font-medium">
+  Salvar
+</Button>
+```
+
+## ✅ Certo (uso da variante com className limpo)
+
+o usar o componente **Button** com a variante **primary**, não é necessário reaplicar estilos. O **className** gerado internamente já cobre os tokens visuais:
+
+```tsx
+<Button variant="primary">
+  Salvar
+</Button>
+```
+
+# 🧩 Inspeção de Metadados do Figma
+
+Ao converter um design do Figma para código, utilize os **componentes existentes** com base nos metadados dos nodes — especialmente o campo `name`.
+
+---
+
+## 🔍 Como identificar o componente e suas variantes
+
+- O campo `name` indica o nome do componente e suas propriedades.
+- Exemplo de `name`:
+
+Button: variant="outline", size="sm"
+
+
+# 🧠 Prompt de Inspeção de Metadados do Figma
+
+Ao inspecionar os nodes exportados do Figma:
+
+1. **Verifique o nome (`name`) do node.**
+   - O nome pode conter informações de propriedades no formato:  
+     `size="default"`, `variant="outline"`, etc.
+   - Essas informações indicam as props que devem ser passadas para o componente correspondente.
+
+2. **Identifique o componente correspondente.**
+   - Exemplos comuns:
+     - Se for um botão → use o componente `Button`.
+     - Se for um input → use `Input`.
+     - Se for um select → use `Select`, e assim por diante.
+
+3. **Monte a estrutura do componente com as props encontradas.**
+   - Exemplo:
+     - Node com o nome: `Button size="default" variant="ghost"`
+     - Deve gerar:  
+       `<Button size="default" variant="ghost">Texto</Button>`
+
+4. **Caso o componente não tenha suporte para alguma prop listada, ignore essa prop.**
+   - As props válidas devem ser conferidas com base nas definições conhecidas do componente.
+
+5. **Sempre preserve a hierarquia e estrutura visual dos nodes filhos.**
+   - Por exemplo, se um botão contém um ícone e texto, deve gerar:
+     ```tsx
+     <Button size="default" variant="default">
+       <Icon name="check" />
+       Confirmar
+     </Button>
+     ```
+
+---
+
+## ✅ Regras de Parsing do Nome
+
+- Props devem ser extraídas do `name` do node, no formato `prop="value"`.
+- O nome do componente deve estar claro ou ser inferido pelo tipo de node ou grupo.
+- Use regex para extrair as props:  
+  `(\w+)="([^"]+)"`
+
+---
+
+## 🧪 Exemplos
+
+### Exemplo 1:
+**Nome do Node:** `Button size="sm" variant="outline"`  
+**Saída esperada:**
+```tsx
+<Button size="sm" variant="outline">Clique aqui</Button>
+```
+
+### Exemplo 2:
+**Nome do Node:** `Button size="sm" variant="outline"`  
+**Saída esperada:**
+```tsx
+<Input placeholder="Seu nome" />
+```
+
+### Exemplo 3:
+**Nome do Node:** `name: disabled size="lg"`  
+**Saída esperada:**
+```tsx
+<Select disabled size="lg" />
+```
