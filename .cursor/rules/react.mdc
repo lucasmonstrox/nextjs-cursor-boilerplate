@@ -3,37 +3,37 @@ description:
 globs: 
 alwaysApply: true
 ---
-# 🚫 Evite `export default` em componentes comuns
+# 🚫 Avoid `export default` in Common Components
 
-Evite usar `export default` para componentes **que não são pages do Next.js**. Prefira **exportações nomeadas** (`export const`). Isso melhora a autocompletação, refatoração e reduz ambiguidade em imports.
+Avoid using `export default` for components **that are not Next.js pages**. Prefer **named exports** (`export const`). Ihis improves autocompletion, refactoring, and reduces ambiguity in imports.
 
-## ❌ Errado (com `export default` em componente comum)
+## ❌ Wrong (with `export default` in a common component)
 
 ```tsx
-const MenuItem = ({ text }: { text: string }) => {
+const MyComponent = ({ text }: MyComponentProps) => {
   return <div>{text}</div>;
 };
 
-export default MenuItem;
+export default MyComponent;
 ```
 
-export default dificulta a refatoração automática e permite renomeações inconsistentes no momento do import.
+Using `export default` hinders automatic refactoring and allows inconsistent renaming during import.
 
-## ✅ Certo (com export const)
+## ✅ Correct (with `export const`)
 
 ```tsx
-export const MenuItem = ({ text }: { text: string }) => {
+export const MyComponent = ({ text }: MyComponentProps) => {
   return <div>{text}</div>;
 };
 ```
 
 ---
 
-# 🎨 Importação de Ícones
+# 🎨 Icon Imports
 
-Sempre utilize `as` para renomear ícones importados. Isso melhora a clareza do propósito do ícone no contexto onde será usado, evitando nomes genéricos e ambíguos no escopo do código.
+Always use `as` to rename imported icons. This improves clarity of the icon's purpose in context, avoiding generic or ambiguous names in the code scope.
 
-## ❌ Errado (import direto sem renomear)
+## ❌ Wrong (direct import without renaming)
 
 ```tsx
 import { FaSignOutAlt } from "react-icons/fa";
@@ -41,9 +41,9 @@ import { FaSignOutAlt } from "react-icons/fa";
 <FaSignOutAlt />
 ```
 
-O nome original do ícone pode não ser claro no contexto. Além disso, nomes genéricos como FaXyz poluem o escopo e dificultam a leitura.
+The original icon name might not be clear in the context. Also, generic names like FaXyz clutter the scope and hinder readability.
 
-## ✅ Certo (import com alias nomeado)
+## ✅ Correct (renamed alias import)
 
 ```tsx
 import { FaSignOutAlt as SignOutIcon } from "react-icons/fa";
@@ -51,20 +51,20 @@ import { FaSignOutAlt as SignOutIcon } from "react-icons/fa";
 <SignOutIcon />
 ```
 
-Dar um nome que reflita a intenção de uso melhora a clareza e facilita a leitura e manutenção do código.
+Giving a name that reflects the usage intention improves clarity and makes the code easier to read and maintain.
 
 ---
 
-# 📥 Imports do React
+# 📥 React Imports
 
-Evite importar o módulo completo do React apenas para usar tipos. Isso adiciona código desnecessário e vai contra as práticas modernas com o JSX automático (React 17+).
+Avoid importing the entire React module just to use types. This adds unnecessary code and goes against modern practices with automatic JSX (React 17+).
 
-## ❌ Errado (importação desnecessária de todo o React)
+## ❌ Wrong (unnecessary full React import)
 
 ```tsx
 import React from 'react';
 
-type MenuItemProps = {
+type MyItemProps = {
   icon: React.ReactNode;
   text: string;
   href: string;
@@ -72,12 +72,12 @@ type MenuItemProps = {
 };
 ```
 
-## ✅ Certo (importando apenas o que precisa)
+## ✅ Correct (only import what you need)
 
 ```tsx
 import { ReactNode } from 'react';
 
-type MenuItemProps = {
+type MyItemProps = {
   icon: ReactNode;
   text: string;
   href: string;
@@ -87,11 +87,11 @@ type MenuItemProps = {
 
 ---
 
-# 📦 Modularização de Componentes
+# 📦 Component Modularization
 
-Cada componente deve estar em seu **próprio arquivo**. Isso garante melhor organização, facilita testes, reaproveitamento e leitura do código. Evite agrupar múltiplos componentes em um único arquivo.
+Each component should be in its **own file**. This ensures better organization, easier testing, reuse, and readability. Avoid grouping multiple components in a single file.
 
-## ❌ Errado (vários componentes no mesmo arquivo)
+## ❌ Wrong (multiple components in the same file)
 
 ```tsx
 // ButtonGroup.tsx
@@ -109,9 +109,9 @@ export const SecondaryButton = ({ text }: { text: string }) => {
 }
 ```
 
-Isso dificulta a reutilização, leitura e testabilidade. Não é escalável.
+This makes reuse, readability, and testability harder. It’s not scalable.
 
-## ✅ Certo (um componente por arquivo)
+## ✅ Correct (one component per file)
 
 ```tsx
 // components/Button.tsx
@@ -125,17 +125,17 @@ export const Button = ({ text, onClick }: ButtonProps) => {
 }
 ```
 
-# 🧩 Priorizando Componentes do Shadcn
+# 🧩 Prioritize Shadcn Components
 
-Antes de criar um componente personalizado, verifique se o Shadcn já oferece uma solução adequada. Isso garante consistência visual, acessibilidade e reduz código duplicado.
+Before creating a custom component, check if Shadcn already offers a suitable solution. This ensures visual consistency, accessibility, and reduces duplicate code.
 
-## ❌ Errado (criando componente personalizado sem necessidade)
+## ❌ Wrong (creating a custom component unnecessarily)
 
 ```tsx
 export const CustomButton = ({ text, onClick }: { text: string; onClick: () => void }) => {
   return (
     <button 
-      className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+      className="bg-primary text-white px-4 py-2 rounded-md hover:bg-blue-600"
       onClick={onClick}
     >
       {text}
@@ -144,7 +144,7 @@ export const CustomButton = ({ text, onClick }: { text: string; onClick: () => v
 }
 ```
 
-## ✅ Certo (utilizando componente do Shadcn)
+## ✅ Correct (using Shadcn component)
 
 ```tsx
 import { Button } from "@/components/ui/button"
@@ -160,17 +160,17 @@ export const ActionButton = ({ text, onClick }: { text: string; onClick: () => v
 
 ---
 
-# Sempre utilize `return`
+# Always use `return`
 
-Mesmo em componentes simples, sempre utilize `return`. Isso facilita a inserção de lógica futura.
+Even in simple components, always use `return`. It makes future logic insertion easier.
 
-## ❌ Errado (sem return)
+## ❌ Wrong (without return)
 
 ```tsx
 const Button = () => <button>Click</button>
 ```
 
-## ✅ Certo (com return)
+## ✅ Correct (with return)
 
 ```tsx
 const Button = () => {
@@ -178,17 +178,40 @@ const Button = () => {
 }
 ```
 
-Usar `return` garante que qualquer adição futura (como condicionais ou efeitos colaterais) seja mais simples de implementar.
+Using `return` ensures that adding logic (like conditionals or side effects) later is easier.
 
 ---
 
-# 🧾 Tipando Props sem `React.FC`
+# 🧾 Typing Props Without `React.FC`
 
-Evite usar `React.FC` (ou `React.FunctionComponent`) por causa de inferências implícitas como `children` obrigatório. Tipar as props diretamente é mais claro e flexível.
+Avoid using `React.FC` (or `React.FunctionComponent`) because it implicitly includes `children` and can lead to less precise prop definitions. It's clearer and more flexible to type your props manually.
 
-## Exemplo com tipo definido manualmente
+## ❌ Wrong: Using `React.FC`
 
 ```tsx
+import React from 'react'
+
+type ButtonProps = {
+  text: string
+  onClick: () => void
+}
+
+const Button: React.FC<ButtonProps> = ({ text, onClick }) => {
+  return <button onClick={onClick}>{text}</button>
+}
+
+const Input: React.FC<React.ComponentProps<'input'>> = (props) => {
+  return <input {...props} />
+}
+```
+
+Using `React.FC` here forces the component to accept `children` by default and adds unnecessary complexity.
+
+## ✅ Correct: Typing Props Manually
+
+```tsx
+import React, { ComponentProps } from 'react'
+
 type ButtonProps = {
   text: string
   onClick: () => void
@@ -197,17 +220,13 @@ type ButtonProps = {
 const Button = ({ text, onClick }: ButtonProps) => {
   return <button onClick={onClick}>{text}</button>
 }
-```
 
-## Exemplo usando `ComponentProps` (sem `React.FC`)
-
-```tsx
-const Input = ({ ...props }: ComponentProps<'input'>) => {
+const Input = (props: ComponentProps<'input'>) => {
   return <input {...props} />
 }
 ```
 
-Essa abordagem funciona bem para reutilizar tipagens nativas do JSX/DOM ou de outros componentes personalizados.
+This approach keeps the type definitions more explicit and avoids implicit props like `children` unless you really want them.
 
 ---
 
@@ -471,5 +490,3 @@ Se não estiver, **use o valor mais próximo** disponível no design system.
 | Font weight        | 500     | `font-medium`      | Valor correspondente                      |
 
 ---
-
-Siga sempre as regras!

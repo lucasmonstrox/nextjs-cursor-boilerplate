@@ -3,17 +3,17 @@ description:
 globs: 
 alwaysApply: true
 ---
-# 🧱 Evite Duplicar **className** em Componentes Reutilizáveis
+# 🧱 Avoid Duplicating **className** in Reusable Components
 
-Antes de criar um novo componente no Figma, **verifique se ele já existe**. Por exemplo, se você precisa de um botão, procure pelo componente `Button`.
+Before creating a new component in Figma, **check if it already exists**. For example, if you need a button, look for the `Button` component.
 
-Evite adicionar manualmente `className` com estilos como `border-radius` (`rounded-md`), `color` (`text-white`, `text-gray-800`), `background-color` (`bg-blue-600`, `bg-red-500`), `padding` (`px-4`, `py-2`, `p-3`), `font-size` (`text-sm`, `text-lg`), etc, se esses estilos **já estão incluídos no componente** (ex: `Button`) por meio de suas variantes — eles **já fazem parte do `className` gerado** internamente.
+Avoid manually adding `className` with styles such as `border-radius` (`rounded-md`), `color` (`text-white`, `text-gray-800`), `background-color` (`bg-blue-600`, `bg-red-500`), `padding` (`px-4`, `py-2`, `p-3`), `font-size` (`text-sm`, `text-lg`), etc., if these styles are **already included in the component** (e.g., `Button`) through its variants — they are **already part of the internally generated `className`**.
 
-> 🎯 Se o estilo já está presente na variante, ele **já será refletido no `className` gerado**, e **não precisa ser reaplicado manualmente**.
+> 🎯 If the style is already present in the variant, it **will be reflected in the generated `className`**, and **does not need to be manually reapplied**.
 
-## ❌ Errado (repetição de estilos já existentes)
+## ❌ Incorrect (repeating already existing styles)
 
-Foi usado o componente `Button`, mas os estilos foram reaplicados manualmente via `className`, o que é redundante e pode gerar inconsistências:
+The `Button` component was used, but styles were manually reapplied via `className`, which is redundant and may lead to inconsistencies:
 
 ```tsx
 <Button className="bg-blue-600 text-white px-4 py-2 rounded-md font-medium">
@@ -21,9 +21,9 @@ Foi usado o componente `Button`, mas os estilos foram reaplicados manualmente vi
 </Button>
 ```
 
-## ✅ Certo (uso da variante com className limpo)
+## ✅ Correct (using the variant with a clean className)
 
-o usar o componente **Button** com a variante **primary**, não é necessário reaplicar estilos. O **className** gerado internamente já cobre os tokens visuais:
+When using the Button component with the primary variant, there's no need to reapply styles. The internally generated className already includes the visual tokens:
 
 ```tsx
 <Button variant="primary">
