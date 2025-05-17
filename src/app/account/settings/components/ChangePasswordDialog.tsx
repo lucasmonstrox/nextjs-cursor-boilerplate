@@ -2,7 +2,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-import { z } from 'zod';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -23,21 +22,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-
-const changePasswordSchema = z
-  .object({
-    currentPassword: z.string().min(1, 'Senha atual obrigatória'),
-    newPassword: z
-      .string()
-      .min(6, 'Nova senha deve ter pelo menos 6 caracteres'),
-    confirmPassword: z.string().min(1, 'Confirme a nova senha'),
-  })
-  .refine((data) => data.newPassword === data.confirmPassword, {
-    message: 'As senhas não coincidem',
-    path: ['confirmPassword'],
-  });
-
-type ChangePasswordFormValues = z.infer<typeof changePasswordSchema>;
+import { ChangePasswordFormValues, changePasswordSchema } from '../schemas';
 
 export function ChangePasswordDialog() {
   const [open, setOpen] = useState(false);
