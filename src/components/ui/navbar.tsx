@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 export const Navbar = () => {
   return (
@@ -7,7 +8,9 @@ export const Navbar = () => {
         <Image src="/next.svg" alt="Logo" width={32} height={32} />
         <span className="font-bold text-lg">MonstroX</span>
       </div>
-      <div className="flex items-center gap-4"></div>
+      <div className="flex items-center gap-4">
+        <ThemeToggle />
+      </div>
     </nav>
   );
 };
